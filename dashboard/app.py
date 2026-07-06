@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import datetime
 import pandas as pd
+import time
 
 # Set page config for dynamic layout and browser title
 st.set_page_config(
@@ -100,10 +101,44 @@ api_url_input = st.sidebar.text_input(
 
 st.sidebar.markdown("---")
 
+# Render Wakeup polling loop to solve Render inactivity spin downs
+if 'connected_endpoints' not in st.session_state:
+    st.session_state['connected_endpoints'] = set()
+
+if api_url_input not in st.session_state['connected_endpoints']:
+    status_placeholder = st.sidebar.empty()
+    progress_placeholder = st.sidebar.empty()
+    
+    with status_placeholder.container():
+        st.info("😴 Waking up Render backend container. Please stand by (takes 50-90s on free tier)...")
+        
+    max_retries = 24  # 120s max
+    woke_up = False
+    for i in range(max_retries):
+        progress_val = min(1.0, (i + 1) / max_retries)
+        progress_placeholder.progress(progress_val)
+        try:
+            r = requests.get(f"{api_url_input}/", timeout=3)
+            if r.status_code == 200:
+                woke_up = True
+                break
+        except requests.exceptions.RequestException:
+            pass
+        time.sleep(5)
+        
+    status_placeholder.empty()
+    progress_placeholder.empty()
+    
+    if woke_up:
+        st.session_state['connected_endpoints'].add(api_url_input)
+        st.sidebar.success("🟢 Connection established!")
+    else:
+        st.sidebar.error("❌ Connection timed out. Refresh page to try again.")
+
 @st.cache_data(ttl=60)
 def fetch_model_metadata(base_url):
     try:
-        r = requests.get(f"{base_url}/model", timeout=5)
+        r = requests.get(f"{base_url}/model", timeout=10)
         if r.status_code == 200:
             return r.json()
     except Exception:
@@ -196,7 +231,7 @@ if trigger_forecast:
     
     with st.spinner("Dispatching query to live service..."):
         try:
-            response = requests.post(f"{api_url_input}/predict", json=payload, timeout=10)
+            response = requests.post(f"{api_url_input}/predict", json=payload, timeout=120)
             
             if response.status_code == 200:
                 result = response.json()
