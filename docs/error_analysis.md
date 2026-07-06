@@ -8,7 +8,7 @@ This document provides a diagnostic evaluation of the winning XGBoost model to u
 
 Below are the diagnostic plots generated from predictions on the chronological validation set (June 15th, 2015 to July 31st, 2015).
 
-![Residual Analysis Plots](/Users/takshpal/.gemini/antigravity-ide/brain/aed60d4a-30c5-4b23-817d-074038b821fd/residual_analysis.png)
+![Residual Analysis Plots](images/residual_analysis.png)
 
 ---
 
