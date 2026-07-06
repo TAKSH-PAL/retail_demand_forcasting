@@ -78,12 +78,12 @@ def prepare_data(train_path: str, store_path: str, stage: int = 0):
     # Categorical encoding (mapping to integers)
     store_type_map = {'a': 0, 'b': 1, 'c': 2, 'd': 3}
     assortment_map = {'a': 0, 'b': 1, 'c': 2}
-    state_holiday_map = {'0': 0, 'a': 1, 'b': 2, 'c': 3}
+    state_holiday_map = {'0': 0, 'a': 1, 'b': 2, 'c': 3, '1': 1, '2': 2, '3': 3}
     promo_interval_map = {'None': 0, 'Jan,Apr,Jul,Oct': 1, 'Feb,May,Aug,Nov': 2, 'Mar,Jun,Sept,Dec': 3}
     
     df['StoreType'] = df['StoreType'].map(store_type_map)
     df['Assortment'] = df['Assortment'].map(assortment_map)
-    df['StateHoliday'] = df['StateHoliday'].map(state_holiday_map)
+    df['StateHoliday'] = df['StateHoliday'].map(state_holiday_map).fillna(0).astype(int)
     df['PromoInterval'] = df['PromoInterval'].map(promo_interval_map)
     
     # Features to exclude from X
