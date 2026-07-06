@@ -1,0 +1,27 @@
+# Python virtual environments
+.venv/
+venv/
+ENV/
+
+# Python cache and bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# macOS system files
+.DS_Store
+
+# Streamlit config/secrets and agent skills (environment symlinks)
+.streamlit/secrets.toml
+.agents/
+.claude/
+
+# CatBoost training outputs
+catboost_info/
+DESIGN.md
