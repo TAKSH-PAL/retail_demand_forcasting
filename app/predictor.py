@@ -226,9 +226,15 @@ class SalesPredictor:
         else:
             confidence = "Medium"
             
+        store_type_char = {0: 'A', 1: 'B', 2: 'C', 3: 'D'}.get(meta.get('StoreType', 0), 'A')
+        comp_dist_val = float(meta.get('CompetitionDistance', 2300.0))
+        
         return {
             "predicted_sales": predicted_sales,
             "confidence": confidence,
             "demand_level": demand_level,
-            "inventory_recommendation": inventory_recommendation
+            "inventory_recommendation": inventory_recommendation,
+            "store_avg": float(store_avg),
+            "competition_distance": comp_dist_val,
+            "store_type": store_type_char
         }

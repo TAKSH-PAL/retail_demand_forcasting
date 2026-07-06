@@ -51,7 +51,10 @@ def predict_sales(request: PredictionRequest):
             predicted_sales=prediction_results["predicted_sales"],
             confidence=prediction_results["confidence"],
             demand_level=prediction_results["demand_level"],
-            inventory_recommendation=prediction_results["inventory_recommendation"]
+            inventory_recommendation=prediction_results["inventory_recommendation"],
+            store_avg=prediction_results["store_avg"],
+            competition_distance=prediction_results["competition_distance"],
+            store_type=prediction_results["store_type"]
         )
     except Exception as e:
         import traceback

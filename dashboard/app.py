@@ -4,6 +4,45 @@ import datetime
 import pandas as pd
 import time
 
+def generate_ai_analyst_report(store, date, promo, state_holiday, school_holiday, predicted_sales, store_avg, comp_dist, store_type):
+    day_of_week = date.weekday() + 1
+    is_weekend = day_of_week in [6, 7]
+    percent_diff = ((predicted_sales - store_avg) / store_avg) * 100
+    
+    # Bullet 1: Demand Drivers
+    if percent_diff > 10:
+        driver = f"Sales are projected at **€{predicted_sales:,.2f}** (a **{percent_diff:.1f}% increase** over the store average of €{store_avg:,.2f}) driven by the compounding impact of active promotions and {'weekend' if is_weekend else 'weekday'} customer momentum."
+    elif percent_diff < -10:
+        driver = f"Sales are projected at **€{predicted_sales:,.2f}** (a **{abs(percent_diff):.1f}% decrease** below the store average of €{store_avg:,.2f}) due to holiday/weekend closures or low seasonal foot traffic."
+    else:
+        driver = f"Sales are projected to remain stable at **€{predicted_sales:,.2f}** (close to the store average of €{store_avg:,.2f}) reflecting standard baseline demand patterns."
+        
+    # Bullet 2: Inventory Recommendation
+    if predicted_sales > store_avg * 1.15:
+        inv = "Increase stock levels by **15% to 20%** immediately for high-velocity promotional SKUs and fast-moving items ahead of the sales day to prevent stockouts."
+    elif predicted_sales < store_avg * 0.85:
+        inv = "Reduce replenishment orders and fresh stock deliveries to minimize holding costs and prevent perishables waste on this low-turnover day."
+    else:
+        inv = "Maintain standard baseline inventory levels; focus on optimizing shelf-refill schedules for core items during shift handovers."
+        
+    # Bullet 3: Competitive Strategy
+    if comp_dist < 500:
+        comp = f"With a close competitor located just **{comp_dist:.0f}m away** from this Store Type {store_type}, implement competitive pricing on promo items and optimize front-of-store displays to capture foot traffic."
+    else:
+        comp = f"Competition is distant ({comp_dist/1000:.1f}km away), allowing the store to capture local market share with standard pricing and focus on customer loyalty programs."
+        
+    # Bullet 4: Operational Risks
+    if state_holiday != '0':
+        risk = "Operational risk is high due to a localized State Holiday; prepare for reduced operating hours, potential labor shortages, or sudden tourism traffic spikes."
+    elif is_weekend:
+        risk = "Expect elevated cashier bottlenecks and high transaction volume on the weekend; recommend scheduling extra cashier shifts for peak afternoon hours."
+    elif promo == 1:
+        risk = "Promotional rush may lead to shelf replenishment delays; ensure dedicated staff are assigned to monitor and restock empty shelves in real time."
+    else:
+        risk = "Operational risks are normal; standard staffing and operations schedules are sufficient."
+        
+    return [driver, inv, comp, risk]
+
 # Set page config for dynamic layout and browser title
 st.set_page_config(
     page_title="Rossmann Demand Forecaster",
@@ -276,6 +315,24 @@ if trigger_forecast:
                     st.markdown('<div class="caption-mono">Operations Directive</div>', unsafe_allow_html=True)
                     st.markdown(f"<p style='font-size: 1.1rem; margin: 0.5rem 0 0 0;'>{result['inventory_recommendation']}</p>", unsafe_allow_html=True)
                     
+                # AI Business Analyst
+                st.markdown("<br>", unsafe_allow_html=True)
+                with st.container(border=True):
+                    st.markdown('<div class="caption-mono">AI Business Analyst Report</div>', unsafe_allow_html=True)
+                    bullets = generate_ai_analyst_report(
+                        store=int(store_id),
+                        date=forecast_date,
+                        promo=1 if promo_active else 0,
+                        state_holiday=state_holiday,
+                        school_holiday=1 if school_holiday_active else 0,
+                        predicted_sales=result["predicted_sales"],
+                        store_avg=result["store_avg"],
+                        comp_dist=result["competition_distance"],
+                        store_type=result["store_type"]
+                    )
+                    for bullet in bullets:
+                        st.markdown(f"- {bullet}")
+
                 # Tech expansion details using monospaced styling
                 st.markdown("<br>", unsafe_allow_html=True)
                 with st.expander("🔍 Trace Pipeline Execution Details"):

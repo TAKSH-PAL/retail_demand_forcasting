@@ -21,6 +21,9 @@ class PredictionResponse(BaseModel):
     confidence: str = Field(..., description="Prediction confidence level (High or Medium)")
     demand_level: str = Field(..., description="Categorical demand level (High, Normal, or Low)")
     inventory_recommendation: str = Field(..., description="Business recommendation for stock/inventory level")
+    store_avg: float = Field(..., description="Historical average sales of the store")
+    competition_distance: float = Field(..., description="Distance to nearest competitor in meters")
+    store_type: str = Field(..., description="Type format of the store (A, B, C, or D)")
 
 class ModelInfoResponse(BaseModel):
     name: str = Field(..., description="Name of the model algorithm")
